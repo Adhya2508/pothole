@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+
+# YOLO training outputs
+runs/
+
+# Dataset
+dataset/train/images/
+dataset/train/labels/
+dataset/valid/images/
+dataset/valid/labels/
+dataset/test/images/
+dataset/test/labels/
+
+# Uploaded & generated images
+backend/uploads/
+backend/predictions/
+
+# Prediction history
+backend/history.json
+
+# macOS
+.DS_Store
+
+backend/models/best.pt
