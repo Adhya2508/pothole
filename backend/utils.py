@@ -23,11 +23,14 @@ def save_prediction_image(result):
 
     filename = str(uuid.uuid4()) + ".jpg"
 
-    output_path = os.path.join("predictions", filename)
+    output_path = os.path.join(
+        "predictions",
+        filename
+    )
 
     cv2.imwrite(output_path, image)
 
-    return filename
+    return filename, output_path
 
 
 def process_results(result, inference_time):
@@ -83,7 +86,7 @@ def process_results(result, inference_time):
         area_percent
     )
 
-    image_name = save_prediction_image(result)
+    image_name, image_path = save_prediction_image(result)
     
 
     return {
@@ -109,7 +112,8 @@ def process_results(result, inference_time):
         ),
 
         "annotated_image": image_name,
-        "annotated_image_url": f"http://127.0.0.1:5000/predictions/{image_name}",
+        "annotated_image_path": image_path,
+        # "annotated_image_url": f"http://127.0.0.1:5000/predictions/{image_name}",
 
         "detections": detections
     }

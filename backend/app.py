@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
 import os
 import uuid
 
 from model import predict_image
 from utils import process_results
 from history import save_prediction, get_history
+from s3_utils import upload_file, get_file_url
 
 app = Flask(__name__)
 
@@ -32,6 +33,7 @@ def predict():
 
     image = request.files["image"]
 
+    # Generate unique filename
     filename = str(uuid.uuid4()) + ".jpg"
 
     image_path = os.path.join(
@@ -39,17 +41,50 @@ def predict():
         filename
     )
 
+    # Save uploaded image locally
     image.save(image_path)
 
+    # Upload original image to S3
+    upload_file(
+        image_path,
+        "uploads/" + filename
+    )
+
+    # Run YOLO prediction
     result, inference_time = predict_image(image_path)
 
+    # Process prediction
     response = process_results(
         result,
         inference_time
     )
 
-    # Save prediction to history.json
+    # Upload annotated prediction image to S3
+    prediction_name = response["annotated_image"]
+    prediction_path = response["annotated_image_path"]
+
+    upload_file(
+        prediction_path,
+        "predictions/" + prediction_name
+    )
+
+    # Replace local URL with S3 URL
+    response["annotated_image_url"] = get_file_url(
+        "predictions/" + prediction_name
+    )
+
+    # Remove temporary path from response
+    del response["annotated_image_path"]
+
+    # Save history
     save_prediction(response)
+
+    # Delete temporary local files
+    if os.path.exists(image_path):
+        os.remove(image_path)
+
+    if os.path.exists(prediction_path):
+        os.remove(prediction_path)
 
     return jsonify(response)
 
@@ -61,6 +96,7 @@ def history():
 
     return jsonify(history_data)
 
+
 @app.route("/health", methods=["GET"])
 def health():
 
@@ -69,14 +105,6 @@ def health():
         "model": "loaded",
         "version": "1.0.0"
     })
-
-@app.route("/predictions/<filename>", methods=["GET"])
-def get_prediction_image(filename):
-
-    return send_from_directory(
-        "predictions",
-        filename
-    )
 
 
 if __name__ == "__main__":
