@@ -1,0 +1,31 @@
+.home {
+  min-height: calc(100vh - 150px);
+}
+
+.hero {
+  padding: 80px 0;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 48px;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 20px;
+  color: #64748b;
+
+  font-size: 20px;
+
+  color: #64748b;
+
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  padding-bottom: 40px;
+}

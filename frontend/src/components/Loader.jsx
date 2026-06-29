@@ -1,0 +1,1 @@
+function Loader() {  return (    <div style={{ textAlign: "center", marginTop: "30px" }}>      <h3>🔄 Analyzing Image...</h3>      <p>Please wait while AI detects potholes.</p>    </div>  );}export default Loader;
