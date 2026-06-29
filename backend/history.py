@@ -1,19 +1,13 @@
-import json
-import os
-from datetime import datetime
+import boto3
 import uuid
+from datetime import datetime
 
-HISTORY_FILE = "history.json"
+# Connect to DynamoDB
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("PredictionHistory")
 
 
 def save_prediction(data):
-
-    if not os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, "w") as f:
-            json.dump([], f)
-
-    with open(HISTORY_FILE, "r") as f:
-        history = json.load(f)
 
     prediction = {
         "prediction_id": str(uuid.uuid4()),
@@ -22,21 +16,18 @@ def save_prediction(data):
         "average_confidence": data["average_confidence"],
         "severity": data["severity"],
         "covered_area_percent": data["covered_area_percent"],
-        "annotated_image": data["annotated_image"]
+        "annotated_image": data["annotated_image"],
+        "annotated_image_url": data["annotated_image_url"]
     }
 
-    history.append(prediction)
-
-    with open(HISTORY_FILE, "w") as f:
-        json.dump(history, f, indent=4)
+    table.put_item(Item=prediction)
 
 
 def get_history():
 
-    if not os.path.exists(HISTORY_FILE):
-        return []
+    response = table.scan()
 
-    with open(HISTORY_FILE, "r") as f:
-        history = json.load(f)
+    if "Items" in response:
+        return response["Items"]
 
-    return history
+    return []
