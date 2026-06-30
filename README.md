@@ -407,6 +407,7 @@ def lambda_handler(event, context):
 - Every request path, HTTP method, and outcome is logged via Python's `logging` module inside the Lambda function.
 - Successful forwarded requests, as well as failures (with full exception tracebacks via `logger.exception`), are captured in **CloudWatch Logs**.
 - This enables debugging of the EC2 ↔ Lambda ↔ API Gateway pipeline without needing direct SSH access to EC2, and can later be extended with **CloudWatch Alarms** for proactive error/latency alerting.
+- Added cloudwatch alarm incase ec2 instance cpu utilization exceeds 80%.
 
 ### 9. React Frontend
 Finally, the **React frontend** is built so users can:
